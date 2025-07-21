@@ -42,7 +42,7 @@ server.tool(
       // userId'yi döndür ki agent memory'e kaydedebilsin
       return {
         type: "text",
-        content: `Kaydınız başarıyla oluşturuldu! Hoş geldiniz ${input.firstName}! Kullanıcı ID'niz: ${userId}`,
+        content: `Kaydınız başarıyla oluşturuldu! Hoş geldiniz ${input.firstName}!`,
         userId: userId // Bu kısmı ekliyoruz
       };
     } catch (error) {
