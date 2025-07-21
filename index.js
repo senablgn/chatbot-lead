@@ -94,7 +94,8 @@ server.tool(
     }
   }
 );
-
+//api eklenecek
+console.log("br")
 const transports = {};
 
 app.get("/sse", async (req, res) => {
