@@ -43,14 +43,17 @@ server.tool(
       return {
         type: "text",
         content: `Kaydınız başarıyla oluşturuldu! Hoş geldiniz ${input.firstName}!`,
-        userId: userId // Bu kısmı ekliyoruz
+        userId: userId ,// Bu kısmı ekliyoruz
+        memory: {
+          currentUserId: userId  // <-- BURASI KRİTİK
+        }
       };
     } catch (error) {
       console.error("Hata:", error.message);
       if (error.response && error.response.data && error.response.data.error) {
         return {
           type: "text",
-          content: `Server error: ${error.response.data.error}`
+          content: `Server error: ${error.response.data.error}`,
         };
       }
       return {
@@ -81,7 +84,7 @@ server.tool(
 
       return {
         type: "text",
-        content: `Kurs başarıyla eklendi: ${course}`,
+        text: `Kurs başarıyla eklendi: ${course}`,
       };
     } catch (error) {
       console.error("Kurs ekleme hatası:", error.message);
@@ -94,6 +97,61 @@ server.tool(
     }
   }
 );
+
+server.tool(
+  "search_courses",
+  "Belirtilen dil veya kurs adına göre mevcut kursları arar ve bilgilerini getirir",
+  {
+    language: z.string().describe("Aranacak dil veya kurs adı (örn: İngilizce, Almanca, Fransızca)"),
+  },
+  async ({ language }) => {
+    try {
+      const response = await axios.get("https://mocki.io/v1/18be592d-643a-456c-baf0-048e329c3b05");
+      const courses = response.data;
+      
+      // Dil adını normalize et (büyük-küçük harf duyarsız)
+      const normalizedLanguage = language.toLowerCase();
+      
+      // İlgili kursları filtrele
+      const matchedCourses = courses.filter(course => 
+        course.language_training.toLowerCase().includes(normalizedLanguage)
+      );
+      
+      if (matchedCourses.length === 0) {
+        return {
+          type: "text",
+          content: `${language} için kurs bulunamadı. Mevcut diller için lütfen farklı bir dil deneyin.`
+        };
+      }
+      
+      // Kurs bilgilerini formatla
+      let courseInfo = `${language} kursları hakkında bilgiler:\n\n`;
+      
+      matchedCourses.forEach((course, index) => {
+        courseInfo += `${index + 1}. ${course.language_training} Kursu\n`;
+        courseInfo += `    Şehir: ${course.branch_city}\n`;
+        courseInfo += `    Telefon: ${course.contact_phone}\n`;
+        courseInfo += `    Email: ${course.contact_email}\n\n`;
+      });
+      
+      courseInfo += `Bu kurslardan herhangi birine ilgi duyuyorsanız, ilgi alanınıza eklemek için bana söyleyebilirsiniz!`;
+      
+      return {
+        type: "text",
+        content: courseInfo
+      };
+      
+    } catch (error) {
+      console.error("Kurs arama hatası:", error.message);
+      return {
+        type: "text",
+        content: "Kurs bilgileri şu anda alınamıyor. Lütfen daha sonra tekrar deneyin."
+      };
+    }
+  }
+);
+
+
 //api eklenecek
 console.log("br")
 const transports = {};
