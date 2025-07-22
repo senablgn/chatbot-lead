@@ -1,0 +1,146 @@
+{
+  "name": "My workflow 4",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        -60
+      ],
+      "id": "f0894600-c3e0-43e2-ac1b-55d1cd3cdfd2",
+      "name": "When chat message received",
+      "webhookId": "acd6d8d0-aa6a-458f-ab52-55874ad9bdc8"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "http://host.docker.internal:3001/sse"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        660,
+        80
+      ],
+      "id": "df857291-69ab-4a77-b633-23dc1fee2616",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }} \n\n\n",
+        "options": {
+          "systemMessage": "=Sen bir dil kursu platformu asistanısın. Görevin, kullanıcıların kayıt olmasına, kursları keşfetmesine ve ilgi alanlarını belirtmesine yardımcı olmaktır.\n\n**KAYIT:**\n- Kullanıcı ilk kez geldiğinde ve kayıt olmak istediğinde, ad, soyad, TCKN, e-posta ve telefon gibi bilgileri iste.\n- Bu bilgileri aldığında `create-user` aracını kullanarak kaydı tamamla.\n- Araçtan dönen `userId`'yi `currentUserId` olarak hafızaya (memory) kaydet. Bu çok önemli.\n\n**KURS ARAMA VE İLGİ EKLEME:**\n- Kullanıcı belirli bir dilde kurs aradığında (örneğin \"İngilizce kurslarınız var mı?\", \"Almanca hakkında bilgi alabilir miyim?\"), `search_and_add_interest` aracını kullan.\n- Bu aracı kullanırken `language` parametresini kullanıcının sorduğu dilden al.\n- `userId` parametresini ise hafızadaki `currentUserId`'den otomatik olarak al.\n- Eğer kullanıcı giriş yapmamışsa (hafızada `currentUserId` yoksa), kurs aramadan önce kayıt olmaları gerektiğini belirt.\n\n**GENEL KURALLAR:**\n- Kullanıcıya ASLA `userId` gibi teknik bilgiler gösterme.\n- Tüm işlemleri hafızadaki `currentUserId` üzerinden yap.\n- Kesinlikle rastgele veya tahmini bir ID üretme."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -120
+      ],
+      "id": "f3a061fe-1ceb-46ad-9d3a-04bbc068488e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        340,
+        100
+      ],
+      "id": "c27dba22-dce5-4a75-a5ec-b0346ce265b9",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "StMsbVpQqC1EvdcU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        100
+      ],
+      "id": "2bf1b541-8237-46c7-aa05-15bf782042e8",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "9unHvbTyPGOr3FVg",
+          "name": "Postgres account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f0db6983-d34a-4e3b-9d02-d3c15ea720a0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3bdbd503bf2ea6de4127f6761775c6ffca2c47f025342565df571aa76179d413"
+  },
+  "id": "8jNQndl5EZRbZytS",
+  "tags": []
+}
