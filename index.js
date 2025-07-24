@@ -5,6 +5,7 @@ import axios from "axios";
 import { z } from "zod";
 
 
+
 const app = express();
 const port = 3001;
 app.use(express.json());
@@ -34,24 +35,26 @@ server.tool(
   },
   async (input) => {
     try {
+        const coursesArray = input.language.split(/,|ve|and/).map(course => course.trim());
+
       // Önce kullanıcı oluşturuluyor
       const response = await axios.post("http://localhost:3000/customer", {
-        nationalId: input.nationalId,
         firstName: input.firstName,
         lastName: input.lastName,
         email: input.email,
         phoneNumber: input.phoneNumber,
+        course: [coursesArray]
       });
 
-      const userId = response.data.userId || input.userId; // Eğer API'den dönmüyorsa input.userId kullan
+      const userId = response.data.userId || input.userId;
 
       // Ardından kurs ilgisi ekleniyor
-      if (input.language) {
-        await axios.post(`http://localhost:3000/user/${userId}`, {
-          course: input.language,
-        });
-        console.log(`User ${userId} için ilgi alanı eklendi: ${input.language}`);
-      }
+      // if (input.language) {
+      //   await axios.post(`http://localhost:3000/user/${userId}`, {
+      //     course: input.language,
+      //   });
+      //   console.log(`User ${userId} için ilgi alanı eklendi: ${input.language}`);
+      // }
 
       // Sonuç başarılıysa kullanıcıya mesaj dönülüyor
       return {
