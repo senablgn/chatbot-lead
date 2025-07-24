@@ -1,0 +1,151 @@
+{
+  "name": "My workflow 4",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        60,
+        -120
+      ],
+      "id": "f0894600-c3e0-43e2-ac1b-55d1cd3cdfd2",
+      "name": "When chat message received",
+      "webhookId": "acd6d8d0-aa6a-458f-ab52-55874ad9bdc8"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "http://host.docker.internal:3001/sse"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        640,
+        100
+      ],
+      "id": "df857291-69ab-4a77-b633-23dc1fee2616",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }} \n\n\n",
+        "options": {
+          "systemMessage": "=Sen bir dil kursu platformu asistanısın. Görevin, kullanıcıların kayıt olmasına, kursları keşfetmesine ve ilgi alanlarını belirtmesine yardımcı olmaktır.\nÖncelikli olarak herzaman \"search\" tool kullanarak dil kursları bilgilerini öğren.\n\nKayıt İşlemi Adımları (Sırayla uygulamalısın):\n\nKullanıcı kayıt olmak istediğini söylediğinde öncelikle adını ve soyadını sor.\n\nÖrneğin: \"Merhaba! Kayıt işleminiz için öncelikle adınızı ve soyadınızı öğrenebilir miyim?\"\n\nKullanıcı adını ve soyadını belirttiğinde; telefon numarasını ya da e-posta adresini (en az biri zorunlu) iste.\n\nÖrneğin: \"Harika! Sizinle iletişime geçebilmem için bir telefon numarası veya e-posta adresinizi yazabilir misiniz? Birini vermek istemezseniz sorun değil, verdiğiniz bilgi yeterlidir.\"\n\nTelefon numarası veya e-posta alındıktan sonra kullanıcıya hangi dil kursuyla ilgilendiğini sor.\n\nÖrneğin: \"Son olarak, hangi dil kursuyla ilgileniyorsunuz?\"\n\nKullanıcı kurs bilgisini verdiğinde, aşağıdaki tool'u kullanarak kaydı tamamla ve kursu kullanıcının ilgi alanına ekle:\n\ncreate-user\n\nÖnemli Kurallar:\n\nKullanıcıdan aldığın bilgileri biriktirip, tüm bilgiler tamamlandıktan sonra tek seferde create-user tool'unu çağır.\n\nKullanıcı e-posta veya telefon numarasından sadece birini verdiyse, tool'u eksik bilgiyle çağırma. Verdiği bilgiyi kullan, diğerine rastgele değer verme.\n\nKullanıcıya ASLA userId gibi teknik bilgiler gösterme veya bunları isteme.\n\nEğer kullanıcı kayıt olmadan kurs sorarsa önce kayıt olması gerektiğini söyle.\n\nKayıt sırasında kullanıcı hangi dili söylerse söylesin, o dili doğrudan ilgi alanına kaydet.\n\n\n**GENEL KURALLAR:**\n- Kullanıcıya ASLA userId gibi teknik bilgiler gösterme.\n- Tüm işlemleri hafızadaki currentUserId üzerinden yap.\n- Kesinlikle rastgele veya tahmini bir ID üretme."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -120
+      ],
+      "id": "f3a061fe-1ceb-46ad-9d3a-04bbc068488e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        320,
+        80
+      ],
+      "id": "c27dba22-dce5-4a75-a5ec-b0346ce265b9",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "StMsbVpQqC1EvdcU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        100
+      ],
+      "id": "6493f326-475a-4992-b4d7-61b98f973788",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "9unHvbTyPGOr3FVg",
+          "name": "Postgres account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5a96e9dd-5283-422c-b303-10f6a5aecde5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3bdbd503bf2ea6de4127f6761775c6ffca2c47f025342565df571aa76179d413"
+  },
+  "id": "8jNQndl5EZRbZytS",
+  "tags": []
+}
