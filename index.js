@@ -43,7 +43,7 @@ server.tool(
         lastName: input.lastName,
         email: input.email,
         phoneNumber: input.phoneNumber,
-        course: [coursesArray]
+        course: coursesArray
       });
 
       const userId = response.data.userId || input.userId;
