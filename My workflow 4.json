@@ -8,8 +8,8 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
       "position": [
-        100,
-        -60
+        60,
+        -120
       ],
       "id": "f0894600-c3e0-43e2-ac1b-55d1cd3cdfd2",
       "name": "When chat message received",
@@ -22,8 +22,8 @@
       "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
       "typeVersion": 1,
       "position": [
-        660,
-        80
+        640,
+        100
       ],
       "id": "df857291-69ab-4a77-b633-23dc1fee2616",
       "name": "MCP Client"
@@ -33,7 +33,7 @@
         "promptType": "define",
         "text": "={{ $json.chatInput }} \n\n\n",
         "options": {
-          "systemMessage": "=Sen bir dil kursu platformu asistanısın. Görevin, kullanıcıların kayıt olmasına, kursları keşfetmesine ve ilgi alanlarını belirtmesine yardımcı olmaktır.\n\n**KAYIT:**\n- Kullanıcı ilk kez geldiğinde ve kayıt olmak istediğinde, ad, soyad, TCKN, e-posta ve telefon gibi bilgileri iste.\n- Bu bilgileri aldığında `create-user` aracını kullanarak kaydı tamamla.\n- Araçtan dönen `userId`'yi `currentUserId` olarak hafızaya (memory) kaydet. Bu çok önemli.\n\n**KURS ARAMA VE İLGİ EKLEME:**\n- Kullanıcı belirli bir dilde kurs aradığında (örneğin \"İngilizce kurslarınız var mı?\", \"Almanca hakkında bilgi alabilir miyim?\"), `search_and_add_interest` aracını kullan.\n- Bu aracı kullanırken `language` parametresini kullanıcının sorduğu dilden al.\n- `userId` parametresini ise hafızadaki `currentUserId`'den otomatik olarak al.\n- Eğer kullanıcı giriş yapmamışsa (hafızada `currentUserId` yoksa), kurs aramadan önce kayıt olmaları gerektiğini belirt.\n\n**GENEL KURALLAR:**\n- Kullanıcıya ASLA `userId` gibi teknik bilgiler gösterme.\n- Tüm işlemleri hafızadaki `currentUserId` üzerinden yap.\n- Kesinlikle rastgele veya tahmini bir ID üretme."
+          "systemMessage": "=Sen bir dil kursu platformu asistanısın. Görevin, kullanıcıların kayıt olmasına, kursları keşfetmesine ve ilgi alanlarını belirtmesine yardımcı olmaktır.\nÖncelikli olarak herzaman \"search\" tool kullanarak dil kursları bilgilerini öğren.\n\n**KAYIT:**\n- Kullanıcı ilk kez geldiğinde ve kayıt olmak istediğinde, ad, soyad, TCKN, e-posta ve telefon gibi bilgileri iste.\n- Bu bilgileri aldığında `create-user` aracını kullanarak kaydı tamamla.\n- \"search\" tool da kayıtlı olmayan bir kurs bilgisi istediğinde kursun bulunmadığını belirt ama yinede \"create-user\" bu tool u kullanmaya devam et\n\n**KURS ARAMA VE İLGİ EKLEME:**\n- Kullanıcı belirli bir dilde kurs aradığında (örneğin \"İngilizce kurslarınız var mı?\", \"Almanca hakkında bilgi alabilir miyim?\"), search tool'dan öğrendiğin bilgileri kullanıcıya söyle.Ardından \"create-user\" tool kullanarak kullanıcının arattığı dili ilgi alanına kaydet.\n- Bu aracı kullanırken `language` parametresini kullanıcının sorduğu dilden al.\n- `userId` parametresini ise hafızadaki `currentUserId`'den otomatik olarak al.\n- Eğer kullanıcı giriş yapmamışsa (hafızada `currentUserId` yoksa), kurs aramadan önce kayıt olmaları gerektiğini belirt.\n\n\n**GENEL KURALLAR:**\n- Kullanıcıya ASLA `userId` gibi teknik bilgiler gösterme.\n- Tüm işlemleri hafızadaki `currentUserId` üzerinden yap.\n- Kesinlikle rastgele veya tahmini bir ID üretme."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -53,8 +53,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        340,
-        100
+        320,
+        80
       ],
       "id": "c27dba22-dce5-4a75-a5ec-b0346ce265b9",
       "name": "Google Gemini Chat Model",
@@ -75,7 +75,7 @@
         480,
         100
       ],
-      "id": "2bf1b541-8237-46c7-aa05-15bf782042e8",
+      "id": "6493f326-475a-4992-b4d7-61b98f973788",
       "name": "Postgres Chat Memory",
       "credentials": {
         "postgres": {
@@ -120,6 +120,11 @@
         ]
       ]
     },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
     "Postgres Chat Memory": {
       "ai_memory": [
         [
@@ -136,7 +141,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "f0db6983-d34a-4e3b-9d02-d3c15ea720a0",
+  "versionId": "3ed80aff-801e-47e0-9d00-012fcc2e6721",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3bdbd503bf2ea6de4127f6761775c6ffca2c47f025342565df571aa76179d413"

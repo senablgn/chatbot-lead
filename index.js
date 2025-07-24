@@ -132,7 +132,7 @@ server.tool(
 
       return {
         type: "text",
-        content: response,
+        content: courses,
       };
     } catch (error) {
       console.error("Kurs arama hatası:", error.message);
