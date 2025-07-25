@@ -23,7 +23,6 @@ server.tool(
   "create-user",
   "It creates a user, returns course information to the user, and adds to the user's interests.",
   {
-    nationalId: z.string().describe("National id of user"),
     firstName: z.string().describe("First name of user"),
     lastName: z.string().describe("Last name of user"),
     email: z.string().describe("Email of user"),
@@ -32,31 +31,23 @@ server.tool(
     language: z
       .string()
       .describe("Language to be searched and added as an interest (e.g., English, German)."),
+    sessionId: z.string().describe("The session ID from the n8n workflow."),
   },
   async (input) => {
     try {
-        const coursesArray = input.language.split(/,|ve|and/).map(course => course.trim());
+      const coursesArray = input.language.split(/,|ve|and/).map(course => course.trim());
 
-      // Önce kullanıcı oluşturuluyor
+
       const response = await axios.post("http://localhost:3000/customer", {
         firstName: input.firstName,
         lastName: input.lastName,
         email: input.email,
         phoneNumber: input.phoneNumber,
-        course: coursesArray
+        courses_of_interest: coursesArray,
+        sessionId: input.sessionId,
       });
 
-      const userId = response.data.userId || input.userId;
-
-      // Ardından kurs ilgisi ekleniyor
-      // if (input.language) {
-      //   await axios.post(`http://localhost:3000/user/${userId}`, {
-      //     course: input.language,
-      //   });
-      //   console.log(`User ${userId} için ilgi alanı eklendi: ${input.language}`);
-      // }
-
-      // Sonuç başarılıysa kullanıcıya mesaj dönülüyor
+      const userId = response.data.id || input.userId;
       return {
         type: "text",
         content: `Kaydınız başarıyla oluşturuldu! Hoş geldiniz ${input.firstName}!`,
@@ -83,55 +74,18 @@ server.tool(
 server.tool(
   "search",
   "It reads the API data and learns information about the courses.",
-  // {
-  //   language: z
-  //     .string()
-  //     .describe(
-  //       "Language to be searched and added as an interest (e.g., English, German)"
-  //     ),
-  // },
 
-  async (
-    {
-      /*userId, language*/
-    }
-  ) => {
-    // try {
-    //   await axios.post(`http://localhost:3000/user/${userId}`, {
-    //     course: language,
-    //   });
-    //   console.log(`Kullanıcı ${userId} için ilgi alanı eklendi: ${language}`);
-    // } catch (error) {
-    //   console.error("Kurs ekleme (ilgi alanı) hatası:", error.message);
-    // }
 
+  async () => {
     try {
       const response = await axios.get(
         "https://mocki.io/v1/18be592d-643a-456c-baf0-048e329c3b05"
       );
       const courses = response.data;
-      //   const normalizedLanguage = language.toLowerCase();
-
-      // const matchedCourses = courses.filter((course) =>
-      //   course.language_training.toLowerCase().includes(normalizedLanguage)
-      // );
-
-      // if (matchedCourses.length === 0) {
-      //   return {
-      //     type: "text",
-
-      //     content: ` şu anda ${language} dilinde  aktif bir kursumuz bulunamadı. Yeni kurslar eklendiğinde size haber vereceğiz!`,
-      //   };
-      // }
 
       let courseInfo = `Harika! Sizin için bulduğum kurslar şunlar:\n\n`;
 
-      // matchedCourses.forEach((course, index) => {
-      //   courseInfo += `${index + 1}. ${course.language_training} Kursu\n`;
-      //   courseInfo += `   Şehir: ${course.branch_city}\n`;
-      //   courseInfo += `   Telefon: ${course.contact_phone}\n`;
-      //   courseInfo += `   Email: ${course.contact_email}\n\n`;
-      // });
+
 
       return {
         type: "text",
@@ -147,7 +101,7 @@ server.tool(
   }
 );
 
-//api eklenecek
+
 console.log("br");
 const transports = {};
 
